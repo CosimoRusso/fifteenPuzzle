@@ -1,0 +1,68 @@
+import numpy as np
+from random import sample
+
+class Game():
+    def __init__(self, size, initial_grid=None):
+        self.size = size
+        self.max_tile = pow(size, 2)
+        if initial_grid is None:
+            self.grid = np.arange(1, size*size+1)
+            rng = np.random.default_rng()
+            rng.shuffle(self.grid)
+            self.grid = self.grid.reshape((size, size))
+        else:
+            self.grid = initial_grid
+
+    def move(self, direction):
+        num = self.max_tile
+        pos_i, pos_j = np.where(self.grid == num)
+        new_pos_i = pos_i
+        new_pos_j = pos_j
+        if direction == 'UP':
+            new_pos_i = pos_i - 1
+        elif direction == 'LEFT':
+            new_pos_j = pos_j - 1
+        elif direction == 'BOTTOM':
+            new_pos_i = pos_i+1
+        elif direction == 'RIGHT':
+            new_pos_j = pos_j + 1
+        else:
+            raise Exception("%s is an invalid direction" % direction)
+        k = self.grid[new_pos_i, new_pos_j]
+        self.grid[new_pos_i, new_pos_j] = num
+        self.grid[pos_i, pos_j] = k
+
+    def get_possible_moves(self):
+        num = self.max_tile
+        i, j = np.where(self.grid == num)
+        out = []
+        if i > 0:
+            out.append("UP")
+        if i < self.size - 1:
+            out.append("BOTTOM")
+        if j > 0:
+            out.append("LEFT")
+        if j < self.size - 1:
+            out.append("RIGHT")
+        return out
+
+    def finished(self):
+        return (np.reshape(self.grid, self.max_tile) == np.arange(1, self.max_tile+1)).all()
+
+    def duplicate(self):
+        return Game(self.size, np.copy(self.grid))
+
+    def __str__(self):
+        out = ""
+        for row in self.grid:
+            for c in row:
+                padding = 4 if self.size > 3 else 3
+                num = ' ' if c == pow(self.size, 2) else c
+                out += ("%s" % num).center(padding) + '|'
+            out += '\n'
+        return out
+
+
+if __name__ == '__main__':
+    g1 = Game(3)
+    print(g1)
