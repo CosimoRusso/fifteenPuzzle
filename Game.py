@@ -1,5 +1,4 @@
 import numpy as np
-from random import sample
 
 class Game():
     def __init__(self, size, initial_grid=None):
@@ -52,6 +51,37 @@ class Game():
     def duplicate(self):
         return Game(self.size, np.copy(self.grid))
 
+    def get_misplaced_tiles(self):
+        final_grid = np.array(np.arange(1, self.max_tile+1)).reshape((self.size, self.size))
+        differences = sum((((self.grid - final_grid) != 0) * 1).reshape(self.max_tile))
+        return differences
+
+    def manhattan_distance(self):
+        final_grid = np.arange(1, self.max_tile+1).reshape((self.size, self.size))
+        man_dist = 0
+        for i in range(self.size):
+            for j in range(self.size):
+                cell = self.grid[i, j]
+                x, y = np.where(final_grid == cell)
+                man_dist += abs(x - i) + abs(y - j)
+        return man_dist
+
+
+    def is_solvable(self):
+        grid = self.grid.reshape(self.max_tile)
+        inversions = 0
+        for i in range(len(grid)):
+            if grid[i] == 9:
+                continue
+            for j in range(i+1, len(grid)):
+                inversions += (grid[i] > grid[j]) * 1
+        max_tile_row, max_tile_col = np.where(self.grid == self.max_tile)
+        return (self.size % 2 == 1 and inversions % 2 == 0) or \
+               (self.size % 2 == 0 and inversions % 2 == 1 and max_tile_row % 2 == 0) or \
+                (self.size % 2 == 0 and inversions % 2 == 0 and max_tile_row % 2 == 1)
+
+
+
     def __str__(self):
         out = ""
         for row in self.grid:
@@ -66,3 +96,4 @@ class Game():
 if __name__ == '__main__':
     g1 = Game(3)
     print(g1)
+    print(g1.manhattan_distance())
