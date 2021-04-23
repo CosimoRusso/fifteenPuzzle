@@ -63,6 +63,7 @@ class Game():
             for j in range(self.size):
                 cell = self.grid[i, j]
                 x, y = np.where(final_grid == cell)
+                x, y = (x[0], y[0])
                 man_dist += abs(x - i) + abs(y - j)
         return man_dist
 
